@@ -127,6 +127,7 @@ app.get('/alexa-check/:id', function(req, res) {
 
 function fetch_target_id(req, res) {
   var id = req.params.id;
+  var orig_url = 'https://www.youtube.com/watch?v='+id;
   var old_url = 'https://www.youtube.com/watch?v=' + id;
   ytdl.getInfo(old_url, function(err, info) {
     if (err) {
