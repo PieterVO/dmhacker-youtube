@@ -162,7 +162,7 @@ function fetch_target_id(req, res) {
             link: '/site/' + id + '.mp3',
             info: {
                 id: id,
-                title: metadata.title,
+                title: info.title,
                 original: orig_url
             }
         });
