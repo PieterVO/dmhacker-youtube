@@ -135,19 +135,36 @@ function fetch_target_id(req, res) {
         message: err.message
       });
     } else {
-      var new_url = path.join(__dirname, 'public', 'site', id + '.mp4');
-      var writer = fs.createWriteStream(new_url);
-      writer.on('finish', function() {
+        if (!(id in cache)) {
+            var tmp_url = path.join(__dirname, 'tmp', id + '.mp4');
+            var new_url = path.join(__dirname, 'public', 'site', id + '.mp3');
+            var writer = fs.createWriteStream(tmp_url);
+            writer.on('finish', function() {
+                ffmpeg(tmp_url)
+                    .format("mp3")
+                    .audioBitrate(128)
+                    .on('end', function(){
+                        cache[id]['downloaded'] = true;
+                    })
+                    .save(new_url);
+            });
+            ytdl(orig_url, {
+                filter: 'audioonly'
+            }).pipe(writer);
+
+            cache[id] = { downloaded: false };
+        }
+
         res.status(200).json({
-          state: 'success',
-          link: '/site/' + id + '.mp4',
-          info: {
-            id: id,
-            title: info.title
-          }
+            state: 'success',
+            message: 'Uploaded successfully.',
+            link: '/site/' + id + '.mp3',
+            info: {
+                id: id,
+                title: metadata.title,
+                original: orig_url
+            }
         });
-      });
-      ytdl(old_url).pipe(writer);
     }
   });
 }
