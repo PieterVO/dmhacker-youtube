@@ -68,12 +68,13 @@ app.get('/alexa-search/:query', function(req, res) {
         var writer = fs.createWriteStream(tmp_url);
         writer.on('finish', function() {
           ffmpeg(tmp_url)
-            .format("mp3")
-            .audioBitrate(128)
-            .on('end', function(){
-              cache[id]['downloaded'] = true;
-            })
-            .save(new_url);
+              .format("mp3")
+              .audioBitrate(128)
+              .audioFilters('loudnorm')
+              .on('end', function(){
+                cache[id]['downloaded'] = true;
+              })
+              .save(new_url);
         });
         ytdl(orig_url, {
           filter: 'audioonly'
@@ -144,6 +145,7 @@ function fetch_target_id(req, res) {
                 ffmpeg(tmp_url)
                     .format("mp3")
                     .audioBitrate(128)
+                    .audioFilters('loudnorm')
                     .on('end', function(){
                         cache[id]['downloaded'] = true;
                     })
